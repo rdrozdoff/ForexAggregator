@@ -22,17 +22,18 @@ public class DataController {
 
     @GetMapping(value = "/quotes")
     public ResponseEntity<Quote> quotes(@RequestParam(value = "symbol", defaultValue = "EURUSD") String symbol) {
-        double open = generatePrice(basePrice);
-        double close = generatePrice(basePrice);
-        double high = generatePrice(basePrice);
-        double low = generatePrice(basePrice);
+        double price = generatePrice(basePrice, 0.05);
+        double open = generatePrice(price, 0.01);
+        double close = generatePrice(price, 0.01);
+        double high = generatePrice(price, 0.01);
+        double low = generatePrice(price, 0.01);
         high = DoubleStream.of(open, close, high, low).max().getAsDouble();
         low = DoubleStream.of(open, close, high, low).min().getAsDouble();
 
         return ResponseEntity.ok(new Quote(symbol, Instant.now().toEpochMilli(), open, close, high, low));
     }
 
-    private double generatePrice(double basePrice) {
-        return Precision.round(basePrice + random.nextDouble() / 100, 5);
+    private double generatePrice(double basePrice, double deviation) {
+        return Precision.round(basePrice + deviation * random.nextDouble(), 5);
     }
 }

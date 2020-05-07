@@ -7,7 +7,7 @@
       volumes:
         - ./services/data-provider/target:/app
       ports:
-        - "80:8080"
+        - "81:8080"
 
     adapter:
       depends_on:
@@ -28,12 +28,13 @@
     storer:
       depends_on:
         - kafka
+        - mysql
       image: openjdk:8-jre-alpine
       command: java -jar /app/data-storer-1.0.0-SNAPSHOT.jar
       volumes:
         - ./services/data-storer/target:/app
       ports:
-        - "81:8081"
+        - "82:8080"
 
     zookeeper:
       image: bitnami/zookeeper:latest
@@ -51,7 +52,7 @@
       environment:
         - KAFKA_CFG_ZOOKEEPER_CONNECT=zookeeper:2181
         - ALLOW_PLAINTEXT_LISTENER=yes
-        - ALLOW_ANONYMOUS_LOGIN=yes
+        - KAFKA_CFG_AUTO_CREATE_TOPICS_ENABLE=true
 
     mysql:
       depends_on:
@@ -66,7 +67,7 @@
     apache:
       image: 'bitnami/apache:latest'
       ports:
-        - '82:8080'
+        - '80:8080'
       volumes:
         - ./http/docs:/app
         - ./http/vhost.conf:/vhosts/my_vhost.conf:ro

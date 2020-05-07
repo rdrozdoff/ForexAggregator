@@ -4,18 +4,15 @@
     <meta charset="UTF-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <meta http-equiv="X-UA-Compatible" content="ie=edge"/>
-    <title>CandleStick Chart</title>
+    <title>ForexAggregator Demo Chart</title>
 
     <link href="./css/styles.css" rel="stylesheet"/>
 
     <style>
-
         #chart {
-      max-width: 800px;
-      margin: 35px auto;
-    }
-
-
+            max-width: 800px;
+            margin: 35px auto;
+        }
     </style>
 
     <script>
@@ -31,7 +28,6 @@
         document.write(
           '<script src="./libs/findindex_polyfill_mdn.js"><\/script>'
         )
-
     </script>
 
     <script src="./libs/react.production.min.js"></script>
@@ -49,8 +45,7 @@
 
 <div id="html">
     &lt;div id=&quot;chart&quot;&gt;
-    &lt;ReactApexChart options={this.state.options} series={this.state.series} type=&quot;candlestick&quot; height={600}
-    /&gt;
+        <ReactApexChart options={this.state.options} series={this.state.series} type=&quot;candlestick&quot; height={600} /&gt;
     &lt;/div&gt;
 </div>
 
@@ -60,7 +55,7 @@
       var quoteData = [];
       var series = [];
 
-      setTimeout(updateChart, 5000);
+      setTimeout(updateChart, 1000);
 
       function updateChart() {
         var xhr = new XMLHttpRequest();
@@ -82,11 +77,10 @@
                 seriesData.data = quoteData;
                 series = [];
                 series.push(seriesData);
-                console.log(series);
-                ReactDOM.render(apexChart, domContainer);
+                ReactDOM.render(React.createElement(ApexChart), domContainer);
             }
         };
-        xhr.open('GET', 'http://localhost:81/quotes');
+        xhr.open('GET', 'http://localhost:82/quotes');
         xhr.send();
       }
 
@@ -134,10 +128,8 @@
 
       const domContainer = document.querySelector('#app');
       const apexChart = React.createElement(ApexChart);
-      //ReactDOM.render(apexChart, domContainer);
-
+      ReactDOM.render(apexChart, domContainer);
+      updateChart();
 </script>
-
-
 </body>
 </html>
