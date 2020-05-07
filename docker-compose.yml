@@ -1,0 +1,64 @@
+  version: "3"
+
+  services:
+    feed:
+      image: openjdk:8-jre-alpine
+      command: java -jar /app/data-provider-1.0.0-SNAPSHOT.jar
+      volumes:
+        - ./services/data-provider/target:/app
+      ports:
+        - "80:8080"
+
+    adapter:
+      depends_on:
+        - kafka
+      image: openjdk:8-jre-alpine
+      command: java -jar /app/data-adapter-1.0.0-SNAPSHOT.jar
+      volumes:
+        - ./services/data-adapter/target:/app
+
+    aggregator:
+      depends_on:
+        - kafka
+      image: fabric8/java-centos-openjdk8-jdk
+      command: java -jar /app/data-aggregator-1.0.0-SNAPSHOT.jar
+      volumes:
+        - ./services/data-aggregator/target:/app
+
+    storer:
+      depends_on:
+        - kafka
+      image: openjdk:8-jre-alpine
+      command: java -jar /app/data-storer-1.0.0-SNAPSHOT.jar
+      volumes:
+        - ./services/data-storer/target:/app
+      ports:
+        - "81:8081"
+
+    zookeeper:
+      image: bitnami/zookeeper:latest
+      ports:
+        - "2181:2181"
+      environment:
+        - ALLOW_ANONYMOUS_LOGIN=yes
+
+    kafka:
+      depends_on:
+        - zookeeper
+      image: bitnami/kafka:latest
+      ports:
+        - "9092:9092"
+      environment:
+        - KAFKA_CFG_ZOOKEEPER_CONNECT=zookeeper:2181
+        - ALLOW_PLAINTEXT_LISTENER=yes
+        - ALLOW_ANONYMOUS_LOGIN=yes
+
+    mysql:
+      depends_on:
+        - kafka
+      image: mysql
+      environment:
+        - MYSQL_ROOT_PASSWORD=demo
+        - MYSQL_DATABASE=forex
+        - MYSQL_USER=forex
+        - MYSQL_PASSWORD=demo

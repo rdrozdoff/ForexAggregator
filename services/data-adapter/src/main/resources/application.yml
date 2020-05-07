@@ -1,0 +1,17 @@
+feed:
+  baseUrl: http://feed:8080
+  pollingRate: 15000
+
+spring:
+  kafka:
+    streams:
+      application-id: forex-aggregator
+    client-id: forex-aggregator
+    bootstrap-servers:
+      - kafka:9092
+    template:
+      default-topic: quotes
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+

@@ -1,0 +1,23 @@
+server.port: 8081
+spring:
+  kafka:
+    bootstrap-servers:
+      - kafka:9092
+    consumer:
+      group-id:  forex-data-storer
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+      properties:
+        spring.json.trusted: org.home.forex.model
+        spring.json.trusted.packages: org.home.forex.model
+  datasource:
+    url: jdbc:mysql://mysql:3306/forex
+    username: forex
+    password: demo
+  jpa:
+    database-platform: org.hibernate.dialect.MySQL5InnoDBDialect
+    hibernate.ddl-auto: update
+    show-sql: false
+
+storer:
+  topic:
+    input: aggregated-quotes

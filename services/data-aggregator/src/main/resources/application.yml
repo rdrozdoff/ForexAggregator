@@ -1,0 +1,20 @@
+spring:
+  kafka:
+    streams:
+      application-id: forex-aggregator
+      properties:
+        default.key.serde: org.apache.kafka.common.serialization.Serdes$LongSerde
+        default.value.serde: org.home.forex.serialization.QuoteSerde
+    client-id: forex-aggregator
+    bootstrap-servers:
+      - kafka:9092
+    template:
+      default-topic: aggregated-quotes
+
+aggregator:
+  period: 60000
+  topic:
+    input: quotes
+    output: aggregated-quotes
+
+
