@@ -62,3 +62,11 @@
         - MYSQL_DATABASE=forex
         - MYSQL_USER=forex
         - MYSQL_PASSWORD=demo
+
+    apache:
+      image: 'bitnami/apache:latest'
+      ports:
+        - '82:8080'
+      volumes:
+        - ./http/docs:/app
+        - ./http/vhost.conf:/vhosts/my_vhost.conf:ro

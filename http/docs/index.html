@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <meta http-equiv="X-UA-Compatible" content="ie=edge"/>
+    <title>CandleStick Chart</title>
+
+    <link href="./css/styles.css" rel="stylesheet"/>
+
+    <style>
+
+        #chart {
+      max-width: 800px;
+      margin: 35px auto;
+    }
+
+
+    </style>
+
+    <script>
+      window.Promise ||
+        document.write(
+          '<script src="./libs/polyfill.min.js"><\/script>'
+        )
+      window.Promise ||
+        document.write(
+          '<script src="./libs/classList.min.js"><\/script>'
+        )
+      window.Promise ||
+        document.write(
+          '<script src="./libs/findindex_polyfill_mdn.js"><\/script>'
+        )
+
+    </script>
+
+    <script src="./libs/react.production.min.js"></script>
+    <script src="./libs/react-dom.production.min.js"></script>
+    <script src="./libs/prop-types.min.js"></script>
+    <script src="./libs/browser.min.js"></script>
+    <script src="./libs/apexcharts.js"></script>
+    <script src="./libs/react-apexcharts.iife.min.js"></script>
+
+</head>
+
+<body>
+
+<div id="app"></div>
+
+<div id="html">
+    &lt;div id=&quot;chart&quot;&gt;
+    &lt;ReactApexChart options={this.state.options} series={this.state.series} type=&quot;candlestick&quot; height={600}
+    /&gt;
+    &lt;/div&gt;
+</div>
+
+<div id="result"></div>
+
+<script type="text/babel">
+      var quoteData = [];
+      var series = [];
+
+      setTimeout(updateChart, 5000);
+
+      function updateChart() {
+        var xhr = new XMLHttpRequest();
+        xhr.onreadystatechange = function() {
+            if (xhr.readyState === 4) {
+                var quotes = JSON.parse(xhr.responseText);
+                quotes.forEach(function(q) {
+                   if (q.timestamp != null) {
+                      var ohlc = [];
+                      ohlc.push(q.open, q.high, q.low, q.close);
+                      var dataEl = new Object();
+                      dataEl.x = new Date(q.timestamp);
+                      dataEl.y = ohlc;
+                      quoteData.push(dataEl);
+                   }
+                });
+
+                var seriesData = new Object();
+                seriesData.data = quoteData;
+                series = [];
+                series.push(seriesData);
+                console.log(series);
+                ReactDOM.render(apexChart, domContainer);
+            }
+        };
+        xhr.open('GET', 'http://localhost:81/quotes');
+        xhr.send();
+      }
+
+      class ApexChart extends React.Component {
+        constructor(props) {
+          super(props);
+
+          this.state = {
+
+            series: [{
+              data: quoteData
+            }],
+            options: {
+              chart: {
+                type: 'candlestick',
+                height: 600
+              },
+              title: {
+                text: 'ForexAggregator Demo EURUSD',
+                align: 'left'
+              },
+              xaxis: {
+                type: 'datetime'
+              },
+              yaxis: {
+                tooltip: {
+                  enabled: true
+                }
+              }
+            },
+          };
+        }
+
+        render() {
+          return (
+            <div>
+              <div id="chart">
+                <ReactApexChart options={this.state.options} series={series} type="candlestick" height={600} />
+              </div>
+              <div id="html-dist"></div>
+            </div>
+          );
+        }
+      }
+
+      const domContainer = document.querySelector('#app');
+      const apexChart = React.createElement(ApexChart);
+      //ReactDOM.render(apexChart, domContainer);
+
+</script>
+
+
+</body>
+</html>
