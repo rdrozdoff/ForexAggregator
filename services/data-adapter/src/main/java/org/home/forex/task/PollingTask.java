@@ -1,5 +1,6 @@
 package org.home.forex.task;
 
+import lombok.extern.slf4j.Slf4j;
 import org.home.forex.KafkaProducer;
 import org.home.forex.model.Quote;
 import org.slf4j.Logger;
@@ -13,9 +14,8 @@ import org.springframework.web.reactive.function.client.WebClient;
 import javax.annotation.PostConstruct;
 
 @Component
+@Slf4j
 public class PollingTask {
-
-    private static final Logger log = LoggerFactory.getLogger(PollingTask.class);
 
     @Value("${feed.baseUrl}")
     private String baseUrl;
@@ -36,6 +36,6 @@ public class PollingTask {
                 .uri("/quotes")
                 .retrieve()
                 .bodyToMono(Quote.class)
-                .subscribe(value -> producer.publish(value));
+                .subscribe(quote -> producer.publish(quote));
     }
 }

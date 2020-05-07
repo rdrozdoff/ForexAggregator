@@ -1,21 +1,24 @@
 package org.home.forex.service;
 
+import lombok.extern.slf4j.Slf4j;
 import org.home.forex.entity.QuoteEntity;
 import org.home.forex.model.Quote;
 import org.home.forex.repository.QuoteRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.DependsOn;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
-@Service
+@Component
+@Slf4j
 public class QuoteService {
-
-    private static final Logger log = LoggerFactory.getLogger(QuoteService.class);
 
     @Autowired
     private QuoteRepository quoteRepository;
@@ -33,8 +36,9 @@ public class QuoteService {
         quoteRepository.save(quoteEntity);
     }
 
-    public List<Quote> findAll() {
-        return StreamSupport.stream(quoteRepository.findAll().spliterator(), false)
+    public List<Quote> getLastQuotes(int pageSize) {
+        PageRequest page = PageRequest.of(0, pageSize);
+        return quoteRepository.findAll(page).getContent().stream()
                 .map(quoteEntity -> {
                     log.debug("Loading quote '{}'", quoteEntity);
 

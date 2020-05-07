@@ -12,11 +12,13 @@ import java.util.List;
 @RestController
 public class DataController {
 
+    public static int DEFAULT_PAGE_SIZE = 500;
+
     @Autowired
     private QuoteService quoteService;
 
     @GetMapping(value = "/quotes")
     public ResponseEntity<List<Quote>> quotes() {
-        return ResponseEntity.ok(quoteService.findAll());
+        return ResponseEntity.ok(quoteService.getLastQuotes(DEFAULT_PAGE_SIZE));
     }
 }

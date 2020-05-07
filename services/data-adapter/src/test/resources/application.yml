@@ -1,0 +1,5 @@
+feed:
+  baseUrl: http://localhost:50000/quotes
+  pollingRate: 100
+  topic:
+    output: quotes

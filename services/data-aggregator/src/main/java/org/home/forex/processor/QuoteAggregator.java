@@ -1,5 +1,7 @@
 package org.home.forex.processor;
 
+import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.streams.KeyValue;
 import org.apache.kafka.streams.kstream.KStream;
 import org.apache.kafka.streams.kstream.Produced;
@@ -15,22 +17,22 @@ import java.time.Duration;
 import java.time.Instant;
 
 @Component
+@Slf4j
+@AllArgsConstructor
 public class QuoteAggregator {
 
-    private static final Logger log = LoggerFactory.getLogger(QuoteAggregator.class);
-
     @Value("${aggregator.topic.output}")
-    private String outputTopic;
+    private final String outputTopic;
 
     @Value("${aggregator.period}")
-    private Long aggregationPeriod;
+    private final Long aggregationPeriod;
 
-    public void process(KStream<String, Quote> stream){
+    public void createStream(KStream<String, Quote> stream){
         Duration windowDuration = Duration.ofMillis(aggregationPeriod);
         stream
             .map((k, v) -> new KeyValue<>(groupTimestamp(v.getTimestamp(), windowDuration), v))
             .groupByKey()
-            .windowedBy(TimeWindows.of(windowDuration))
+            .windowedBy(TimeWindows.of(windowDuration).grace(Duration.ZERO))
             .aggregate(this::initialize, this::aggregateQuotes)
             .toStream()
             .to(outputTopic, Produced.keySerde(WindowedSerdes.timeWindowedSerdeFrom(Long.class)));
@@ -38,7 +40,7 @@ public class QuoteAggregator {
 
     private Quote initialize() {
         log.debug("Starting aggregation");
-        return new Quote(null, Instant.now().toEpochMilli(),null,null, Double.MIN_VALUE, Double.MAX_VALUE);
+        return new Quote(null, Instant.now().toEpochMilli(), null, null, Double.MIN_VALUE, Double.MAX_VALUE);
     }
 
     private Quote aggregateQuotes(Long timestamp, Quote quote, Quote aggregatedQuote) {

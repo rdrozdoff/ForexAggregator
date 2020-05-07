@@ -2,8 +2,11 @@ package org.home.forex.model;
 
 import lombok.*;
 
+@AllArgsConstructor
+@NoArgsConstructor
 @Getter @Setter
 @ToString
+@EqualsAndHashCode
 public class Quote {
     private String symbol;
     private Long timestamp;

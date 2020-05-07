@@ -13,6 +13,6 @@ spring:
 
 feed:
   baseUrl: http://feed:8080
-  pollingRate: 15000
-
-
+  pollingRate: 10000
+  topic:
+    output: quotes
