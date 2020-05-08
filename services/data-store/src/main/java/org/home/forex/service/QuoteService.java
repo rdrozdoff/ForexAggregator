@@ -4,17 +4,12 @@ import lombok.extern.slf4j.Slf4j;
 import org.home.forex.entity.QuoteEntity;
 import org.home.forex.model.Quote;
 import org.home.forex.repository.QuoteRepository;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.DependsOn;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Component;
-import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.stream.Collectors;
-import java.util.stream.StreamSupport;
 
 @Component
 @Slf4j
@@ -37,8 +32,10 @@ public class QuoteService {
     }
 
     public List<Quote> getLastQuotes(int pageSize) {
-        PageRequest page = PageRequest.of(0, pageSize);
-        return quoteRepository.findAll(page).getContent().stream()
+        int lastPage = Math.max(0, (int) quoteRepository.count() / pageSize - 1);
+        PageRequest pageRequest = PageRequest.of(lastPage, pageSize);
+
+        return quoteRepository.findAll(pageRequest).getContent().stream()
                 .map(quoteEntity -> {
                     log.debug("Loading quote '{}'", quoteEntity);
 

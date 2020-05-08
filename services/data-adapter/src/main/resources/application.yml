@@ -12,7 +12,7 @@ spring:
       value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
 
 feed:
-  baseUrl: http://feed:8080
+  url: http://feed:8080/quotes
   pollingRate: 10000
   topic:
     output: quotes

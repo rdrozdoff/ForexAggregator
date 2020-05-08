@@ -3,7 +3,8 @@
   services:
     feed:
       image: openjdk:8-jre-alpine
-      command: java -jar /app/data-provider-1.0.0-SNAPSHOT.jar
+      restart: always
+      command: java -jar /app/data-provider-${version}.jar
       volumes:
         - ./services/data-provider/target:/app
       ports:
@@ -13,31 +14,37 @@
       depends_on:
         - kafka
       image: openjdk:8-jre-alpine
-      command: java -jar /app/data-adapter-1.0.0-SNAPSHOT.jar
+      restart: always
+      command: java -jar /app/data-adapter-${version}.jar
       volumes:
         - ./services/data-adapter/target:/app
+      environment:
+        - FEED_URL=${feedUrl}
 
     aggregator:
       depends_on:
-        - kafka
+        - adapter
       image: fabric8/java-centos-openjdk8-jdk
-      command: java -jar /app/data-aggregator-1.0.0-SNAPSHOT.jar
+      restart: always
+      command: java -jar /app/data-aggregator-${version}.jar
       volumes:
         - ./services/data-aggregator/target:/app
 
-    storer:
+    store:
       depends_on:
-        - kafka
+        - aggregator
         - mysql
       image: openjdk:8-jre-alpine
-      command: java -jar /app/data-storer-1.0.0-SNAPSHOT.jar
+      restart: always
+      command: java -jar /app/data-store-${version}.jar
       volumes:
-        - ./services/data-storer/target:/app
+        - ./services/data-store/target:/app
       ports:
         - "82:8080"
 
     zookeeper:
       image: bitnami/zookeeper:latest
+      restart: always
       ports:
         - "2181:2181"
       environment:
@@ -47,6 +54,7 @@
       depends_on:
         - zookeeper
       image: bitnami/kafka:latest
+      restart: always
       ports:
         - "9092:9092"
       environment:
@@ -58,6 +66,7 @@
       depends_on:
         - kafka
       image: mysql
+      restart: always
       environment:
         - MYSQL_ROOT_PASSWORD=demo
         - MYSQL_DATABASE=forex
@@ -66,6 +75,7 @@
 
     apache:
       image: 'bitnami/apache:latest'
+      restart: always
       ports:
         - '80:8080'
       volumes:

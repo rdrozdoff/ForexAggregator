@@ -25,14 +25,7 @@ import static org.mockito.Mockito.verify;
 @SpringBootTest
 public class PollingTaskTest {
 
-    private final static Quote sampleQuote = new Quote(
-            "EURUSD",
-            123456789L,
-            1.0,
-            2.0,
-            3.0,
-            0.0
-    );
+    private final static Quote sampleQuote = new Quote("EURUSD",123456789L,1.0,2.0,3.0,0.0);
 
     @MockBean
     private KafkaTemplate<String, Quote> kafkaTemplate;
@@ -47,7 +40,7 @@ public class PollingTaskTest {
             .setHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
             .setBody(new ObjectMapper().writeValueAsString(sampleQuote))
         );
-        mockWebServer.start(50000);
+        mockWebServer.start(51000);
     }
 
     @Test

@@ -55,8 +55,6 @@
       var quoteData = [];
       var series = [];
 
-      setTimeout(updateChart, 1000);
-
       function updateChart() {
         var xhr = new XMLHttpRequest();
         xhr.onreadystatechange = function() {
@@ -80,7 +78,7 @@
                 ReactDOM.render(React.createElement(ApexChart), domContainer);
             }
         };
-        xhr.open('GET', 'http://localhost:82/quotes');
+        xhr.open('GET', 'http://localhost:82/quotes?limit=100');
         xhr.send();
       }
 

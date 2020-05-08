@@ -1,6 +1,5 @@
 package org.home.forex.processor;
 
-import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.streams.KeyValue;
 import org.apache.kafka.streams.kstream.KStream;
@@ -8,8 +7,8 @@ import org.apache.kafka.streams.kstream.Produced;
 import org.apache.kafka.streams.kstream.TimeWindows;
 import org.apache.kafka.streams.kstream.WindowedSerdes;
 import org.home.forex.model.Quote;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.home.forex.strategy.AggregationStrategy;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -18,14 +17,21 @@ import java.time.Instant;
 
 @Component
 @Slf4j
-@AllArgsConstructor
-public class QuoteAggregator {
+public class QuoteProcessor {
 
-    @Value("${aggregator.topic.output}")
+    private final AggregationStrategy aggregationStrategy;
+
+    private final Long aggregationPeriod;
+
     private final String outputTopic;
 
-    @Value("${aggregator.period}")
-    private final Long aggregationPeriod;
+    public QuoteProcessor(@Qualifier("simpleAggregationStrategy") AggregationStrategy aggregationStrategy,
+                          @Value("${aggregator.topic.output}") String outputTopic,
+                          @Value("${aggregator.period}") Long aggregationPeriod) {
+        this.aggregationStrategy = aggregationStrategy;
+        this.aggregationPeriod = aggregationPeriod;
+        this.outputTopic = outputTopic;
+    }
 
     public void createStream(KStream<String, Quote> stream){
         Duration windowDuration = Duration.ofMillis(aggregationPeriod);
@@ -44,19 +50,7 @@ public class QuoteAggregator {
     }
 
     private Quote aggregateQuotes(Long timestamp, Quote quote, Quote aggregatedQuote) {
-        aggregatedQuote.setSymbol(quote.getSymbol());
-        aggregatedQuote.setTimestamp(quote.getTimestamp());
-
-        if (aggregatedQuote.getOpen() == null) {
-            aggregatedQuote.setOpen(quote.getOpen());
-        }
-        aggregatedQuote.setClose(quote.getClose());
-        aggregatedQuote.setHigh(Math.max(quote.getHigh(), aggregatedQuote.getHigh()));
-        aggregatedQuote.setLow(Math.min(quote.getLow(), aggregatedQuote.getLow()));
-
-        log.debug("Aggregating quote '{}'", quote);
-
-        return aggregatedQuote;
+        return aggregationStrategy.aggregate(quote, aggregatedQuote);
     }
 
     private Long groupTimestamp(Long timestamp, Duration duration) {

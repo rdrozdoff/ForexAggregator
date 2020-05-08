@@ -6,6 +6,7 @@ import org.apache.kafka.streams.kstream.KStream;
 import org.home.forex.KafkaStreamBuilder;
 import org.home.forex.model.Quote;
 import org.home.forex.serialization.QuoteSerde;
+import org.home.forex.strategy.AggregationStrategyImpl;
 import org.junit.Assert;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -14,7 +15,7 @@ import org.junit.jupiter.api.Test;
 import java.time.Instant;
 import java.util.Properties;
 
-public class QuoteAggregatorTest {
+public class QuoteProcessorTest {
 
     private final static String INPUT_TOPIC = "quotes";
     private final static String OUTPUT_TOPIC = "aggregated-quotes";
@@ -29,11 +30,11 @@ public class QuoteAggregatorTest {
 
     @BeforeEach
     public void setUp() {
-        QuoteAggregator quoteAggregator = new QuoteAggregator(OUTPUT_TOPIC, (long)5000);
+        QuoteProcessor quoteProcessor = new QuoteProcessor(new AggregationStrategyImpl(), OUTPUT_TOPIC, 5000L);
         StreamsBuilder streamsBuilder = new StreamsBuilder();
-        KStream<String, Quote> stream = new KafkaStreamBuilder(INPUT_TOPIC, quoteAggregator)
+        KStream<String, Quote> stream = new KafkaStreamBuilder(INPUT_TOPIC, quoteProcessor)
                 .kafkaStream(streamsBuilder);
-        quoteAggregator.createStream(stream);
+        quoteProcessor.createStream(stream);
 
         Properties streamsConfig = new Properties();
         streamsConfig.put(StreamsConfig.APPLICATION_ID_CONFIG, "aggregator");

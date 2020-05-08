@@ -12,7 +12,7 @@ public class QuoteConsumer {
     @Autowired
     private QuoteService quoteService;
 
-    @KafkaListener(topics = "${storer.topic.input}")
+    @KafkaListener(topics = "${store.topic.input}")
     public void consume(Quote quote) {
         quoteService.saveQuote(quote);
     }
