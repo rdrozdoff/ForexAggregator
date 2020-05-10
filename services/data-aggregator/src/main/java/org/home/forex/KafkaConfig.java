@@ -1,5 +1,6 @@
 package org.home.forex;
 
+import org.apache.kafka.clients.admin.NewTopic;
 import org.apache.kafka.common.serialization.Serdes;
 import org.apache.kafka.streams.StreamsBuilder;
 import org.apache.kafka.streams.kstream.Consumed;
@@ -16,13 +17,13 @@ import org.springframework.kafka.annotation.EnableKafkaStreams;
 @Configuration
 @EnableKafka
 @EnableKafkaStreams
-public class KafkaStreamBuilder {
+public class KafkaConfig {
 
     private String inputTopic;
 
     private QuoteProcessor quoteProcessor;
 
-    public KafkaStreamBuilder(@Value("${aggregator.topic.input}") String inputTopic, QuoteProcessor quoteProcessor) {
+    public KafkaConfig(@Value("${aggregator.topic.input}") String inputTopic, QuoteProcessor quoteProcessor) {
         this.inputTopic = inputTopic;
         this.quoteProcessor = quoteProcessor;
     }
@@ -35,5 +36,15 @@ public class KafkaStreamBuilder {
         this.quoteProcessor.createStream(stream);
 
         return stream;
+    }
+
+    @Bean
+    public NewTopic inputTopic(@Value("${aggregator.topic.input}") String inputTopic) {
+        return new NewTopic(inputTopic, 1, (short) 1);
+    }
+
+    @Bean
+    public NewTopic outputTopic(@Value("${aggregator.topic.output}") String outputTopic) {
+        return new NewTopic(outputTopic, 1, (short) 1);
     }
 }

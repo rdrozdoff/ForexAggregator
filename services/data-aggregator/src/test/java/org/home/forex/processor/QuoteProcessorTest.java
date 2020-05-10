@@ -3,7 +3,7 @@ package org.home.forex.processor;
 import org.apache.kafka.common.serialization.Serdes;
 import org.apache.kafka.streams.*;
 import org.apache.kafka.streams.kstream.KStream;
-import org.home.forex.KafkaStreamBuilder;
+import org.home.forex.KafkaConfig;
 import org.home.forex.model.Quote;
 import org.home.forex.serialization.QuoteSerde;
 import org.home.forex.strategy.AggregationStrategyImpl;
@@ -32,7 +32,7 @@ public class QuoteProcessorTest {
     public void setUp() {
         QuoteProcessor quoteProcessor = new QuoteProcessor(new AggregationStrategyImpl(), OUTPUT_TOPIC, 5000L);
         StreamsBuilder streamsBuilder = new StreamsBuilder();
-        KStream<String, Quote> stream = new KafkaStreamBuilder(INPUT_TOPIC, quoteProcessor)
+        KStream<String, Quote> stream = new KafkaConfig(INPUT_TOPIC, quoteProcessor)
                 .kafkaStream(streamsBuilder);
         quoteProcessor.createStream(stream);
 
