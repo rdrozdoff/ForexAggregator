@@ -4,31 +4,36 @@
     feed:
       image: openjdk:8-jre-alpine
       restart: always
-      command: java -jar /app/data-provider-${version}.jar
+      command: java ${java_opts} -jar /app/data-provider-${version}.jar
       volumes:
         - ./services/data-provider/target:/app
       ports:
         - "81:8080"
+        - "5005:5005"
 
     adapter:
       depends_on:
         - kafka
       image: openjdk:8-jre-alpine
       restart: always
-      command: java -jar /app/data-adapter-${version}.jar
+      command: java ${java_opts} -jar /app/data-adapter-${version}.jar
       volumes:
         - ./services/data-adapter/target:/app
       environment:
         - FEED_URL=${feedUrl}
+      ports:
+        - "5006:5005"
 
     aggregator:
       depends_on:
         - adapter
       image: fabric8/java-centos-openjdk8-jdk
       restart: always
-      command: java -jar /app/data-aggregator-${version}.jar
+      command: java ${java_opts} -jar /app/data-aggregator-${version}.jar
       volumes:
         - ./services/data-aggregator/target:/app
+      ports:
+        - "5007:5005"
 
     store:
       depends_on:
@@ -36,11 +41,12 @@
         - mysql
       image: openjdk:8-jre-alpine
       restart: always
-      command: java -jar /app/data-store-${version}.jar
+      command: java ${java_opts} -jar /app/data-store-${version}.jar
       volumes:
         - ./services/data-store/target:/app
       ports:
         - "82:8080"
+        - "5008:5005"
 
     zookeeper:
       image: bitnami/zookeeper:latest
@@ -76,8 +82,8 @@
     apache:
       image: 'bitnami/apache:latest'
       restart: always
-      ports:
-        - '80:8080'
       volumes:
         - ./http/docs:/app
         - ./http/vhost.conf:/vhosts/my_vhost.conf:ro
+      ports:
+        - '80:8080'
