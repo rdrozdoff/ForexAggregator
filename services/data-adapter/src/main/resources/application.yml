@@ -1,4 +1,6 @@
 spring:
+  application:
+    name: data-adapter
   kafka:
     streams:
       application-id: forex-aggregator
@@ -10,6 +12,14 @@ spring:
     producer:
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
       value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://eureka:9090/eureka
+  instance:
+      statusPageUrl: http://localhost:82/actuator/info
+      healthCheckUrlPath: http://localhost:82/actuator/health
 
 feed:
   url: http://feed:8080/quotes

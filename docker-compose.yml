@@ -3,10 +3,12 @@
   services:
     feed:
       image: openjdk:8-jre-alpine
-      restart: always
+      restart: unless-stopped
       command: java ${java_opts} -jar /app/data-provider-${version}.jar
       volumes:
         - ./services/data-provider/target:/app
+      environment:
+        - EUREKA_CLIENT_ENABLED=${enable_discovery_client}
       ports:
         - "81:8080"
         - "5005:5005"
@@ -15,42 +17,58 @@
       depends_on:
         - kafka
       image: openjdk:8-jre-alpine
-      restart: always
+      restart: unless-stopped
       command: java ${java_opts} -jar /app/data-adapter-${version}.jar
       volumes:
         - ./services/data-adapter/target:/app
       environment:
         - FEED_URL=${feedUrl}
+        - EUREKA_CLIENT_ENABLED=${enable_discovery_client}
       ports:
+        - "82:8080"
         - "5006:5005"
 
     aggregator:
       depends_on:
-        - adapter
+        - kafka
       image: fabric8/java-centos-openjdk8-jdk
-      restart: always
+      restart: unless-stopped
       command: java ${java_opts} -jar /app/data-aggregator-${version}.jar
       volumes:
         - ./services/data-aggregator/target:/app
+      environment:
+        - EUREKA_CLIENT_ENABLED=${enable_discovery_client}
       ports:
+        - "83:8080"
         - "5007:5005"
 
     store:
       depends_on:
-        - aggregator
+        - kafka
         - mysql
       image: openjdk:8-jre-alpine
-      restart: always
+      restart: unless-stopped
       command: java ${java_opts} -jar /app/data-store-${version}.jar
       volumes:
         - ./services/data-store/target:/app
+      environment:
+        - EUREKA_CLIENT_ENABLED=${enable_discovery_client}
       ports:
-        - "82:8080"
+        - "84:8080"
         - "5008:5005"
+
+    eureka:
+      image: openjdk:8-jre-alpine
+      restart: unless-stopped
+      command: java -jar /app/eureka-${version}.jar
+      volumes:
+        - ./services/eureka/target:/app
+      ports:
+        - "9090:9090"
 
     zookeeper:
       image: bitnami/zookeeper:latest
-      restart: always
+      restart: unless-stopped
       ports:
         - "2181:2181"
       environment:
@@ -60,7 +78,7 @@
       depends_on:
         - zookeeper
       image: bitnami/kafka:latest
-      restart: always
+      restart: unless-stopped
       ports:
         - "9092:9092"
       environment:
@@ -72,7 +90,7 @@
       depends_on:
         - kafka
       image: mysql
-      restart: always
+      restart: unless-stopped
       environment:
         - MYSQL_ROOT_PASSWORD=demo
         - MYSQL_DATABASE=forex
@@ -81,7 +99,7 @@
 
     apache:
       image: 'bitnami/apache:latest'
-      restart: always
+      restart: unless-stopped
       volumes:
         - ./http/docs:/app
         - ./http/vhost.conf:/vhosts/my_vhost.conf:ro

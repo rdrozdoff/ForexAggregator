@@ -3,7 +3,7 @@ Feature: Quotes aggregation
   Scenario: Produce 3 quotes and aggregate them
 
     Given mock producer is started on port 50000
-    And aggregated quotes are produced at 'http://localhost:82/quotes?limit=1'
+    And aggregated quotes are produced at 'http://localhost:84/quotes?limit=1'
 
     When quote is produced in OHLC format [1.0, 1.5, 1.0, 1.3]
     And quote is produced in OHLC format [1.1, 1.7, 1.1, 1.5]

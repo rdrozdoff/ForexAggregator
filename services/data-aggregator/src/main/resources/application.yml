@@ -1,15 +1,28 @@
 spring:
+  application:
+    name:  data-aggregator
   kafka:
     streams:
-      application-id: forex-aggregator
+      application-id: data-aggregator
       properties:
         default.key.serde: org.apache.kafka.common.serialization.Serdes$LongSerde
         default.value.serde: org.home.forex.serialization.QuoteSerde
-    client-id: forex-aggregator
+    client-id: data-aggregator
     bootstrap-servers:
       - kafka:9092
     template:
       default-topic: aggregated-quotes
+
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://eureka:9090/eureka
+  instance:
+    statusPageUrl: http://localhost:83/actuator/info
+    healthCheckUrlPath: http://localhost:83/actuator/health
+
+server:
+  port: 8080
 
 aggregator:
   period: 60000
