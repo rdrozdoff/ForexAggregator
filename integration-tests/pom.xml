@@ -14,7 +14,7 @@
     <name>Forex Data Aggregator Integration Tests</name>
 
     <properties>
-        <junit.version>4.13</junit.version>
+        <junit.version>4.13.1</junit.version>
         <cucumber.version>5.6.0</cucumber.version>
         <maven.failsafe.version>2.22.1</maven.failsafe.version>
         <maven.docker-compose.version>4.0.0</maven.docker-compose.version>
