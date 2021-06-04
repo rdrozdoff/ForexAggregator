@@ -19,7 +19,7 @@
     <properties>
         <kafka.version>2.4.0</kafka.version>
         <lombok.version>1.18.12</lombok.version>
-        <hibernate-validator.version>6.1.0.Final</hibernate-validator.version>
+        <hibernate-validator.version>6.1.5.Final</hibernate-validator.version>
         <spring-cloud.version>Hoxton.SR4</spring-cloud.version>
         <spring-cloud-eureka.version>2.2.2.RELEASE</spring-cloud-eureka.version>
         <junit-jupiter.version>5.5.2</junit-jupiter.version>
